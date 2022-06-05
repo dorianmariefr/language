@@ -23,12 +23,9 @@ class Language
     end
 
     macro method_missing(method)
-      {% if method != method %}
-        {% p method %}
-        def {{method}}
-          @language.find_rule(method)
-        end
-      {% end %}
+      def {{method}}
+        @language.find_rule(method)
+      end
     end
   end
 end

@@ -1,4 +1,6 @@
-require "./language/*"
+require "./language/parser"
+require "./language/atom"
+require "./language/definition"
 
 class Language
   VERSION = "0.1.0"

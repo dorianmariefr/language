@@ -6,6 +6,9 @@ class Language
     class EndOfInput < Interuption
     end
 
+    class NotEndOfInput < Exception
+    end
+
     alias Output = String |
       Hash(Symbol, Output)
 
@@ -18,7 +21,11 @@ class Language
 
     def parse
       @root.parse(self)
-      @output
+      if @cursor == @input.size
+        @output
+      else
+        raise NotEndOfInput.new("cursor at #{@cursor}, input size #{@input.size}")
+      end
     end
 
     def consume(n)
@@ -37,6 +44,10 @@ class Language
       @buffer = ""
 
       self
+    end
+
+    def next?(string)
+      @input[@cursor...(@cursor + string.size)] == string
     end
   end
 end

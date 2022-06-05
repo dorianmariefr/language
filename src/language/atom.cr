@@ -30,7 +30,31 @@ class Language
     end
 
     class Str < Atom
+      class NotFound < Parser::Interuption
+      end
+
       def initialize(@string : String, @parent : Atom? = nil)
+      end
+
+      def parse(parser)
+        @parent.not_nil!.parse(parser) if @parent
+
+        if parser.next?(@string)
+          parser.consume(@string.size)
+        else
+          raise NotFound.new("expected #{@string}")
+        end
+      end
+    end
+
+    class Or < Atom
+      def initialize(@left : Atom = nil, @right : Atom = nil)
+      end
+
+      def parse(parser)
+        @left.not_nil!.parse(parser)
+      rescue Parser::Interuption
+        @right.not_nil!.parse(parser)
       end
     end
 
@@ -61,6 +85,10 @@ class Language
 
     def aka(name)
       Aka.new(parent: self, name: name)
+    end
+
+    def |(other)
+      Or.new(left: self, right: other)
     end
 
     def parse(parser)

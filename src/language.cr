@@ -1,18 +1,19 @@
 require "./language/parser"
 require "./language/atom"
 require "./language/definition"
+require "./language/rule"
 
 class Language
   VERSION = "0.1.0"
 
-  @root : Atom
-  @rules : Array(Atom)
+  @root : Rule
+  @rules : Array(Rule)
 
   getter rules
 
   def initialize
-    @rules = [] of Atom
-    @root = Atom.new
+    @rules = [] of Rule
+    @root = Rule.new
   end
 
   def self.create(&block)
@@ -26,18 +27,21 @@ class Language
   end
 
   def root(&block)
-    @root = with Definition.new(name: :root, language: self) yield
+    atom = with Definition.new(name: :root, language: self) yield
+    @root = Rule.new(atom: atom)
   end
 
   def rule(name, &block)
-    @rules << with Definition.new(name: name, language: self) yield
+    atom = with Definition.new(name: name, language: self) yield
+    @rules << Rule.new(name: name, atom: atom)
   end
 
   def find_rule(name)
-    if name == :root
-      @root
-    else
-      @rules.detect { |rule| rule.name == name }
-    end
+    (@rules + [@root]).find { |rule| rule.name == name }
+  end
+
+  def find_atom(name)
+    rule = find_rule(name)
+    rule ? rule.not_nil!.atom : nil
   end
 end

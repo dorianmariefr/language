@@ -12,7 +12,7 @@ class Language
     alias Output = String |
       Hash(Symbol, Output)
 
-    def initialize(@root : Atom, @rules : Array(Atom), @input : String)
+    def initialize(@root : Rule, @rules : Array(Rule), @input : String)
       @cursor = 0
       @size = @input.size
       @output = {} of Symbol => Output
@@ -21,6 +21,7 @@ class Language
 
     def parse
       @root.parse(self)
+
       if @cursor == @input.size
         @output
       else

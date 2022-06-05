@@ -48,7 +48,7 @@ class Language
     end
 
     class Or < Atom
-      def initialize(@left : Atom = nil, @right : Atom = nil)
+      def initialize(@left : Atom? = nil, @right : Atom? = nil)
       end
 
       def parse(parser)

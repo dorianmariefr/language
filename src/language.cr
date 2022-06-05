@@ -6,6 +6,9 @@ class Language
   VERSION = "0.1.0"
 
   @root : Atom
+  @rules : Array(Atom)
+
+  getter rules
 
   def initialize
     @rules = [] of Atom
@@ -23,10 +26,18 @@ class Language
   end
 
   def root(&block)
-    @root = with Definition.new(:root) yield
+    @root = with Definition.new(name: :root, language: self) yield
   end
 
   def rule(name, &block)
-    @rules = with Definition.new(name) yield
+    @rules << with Definition.new(name: name, language: self) yield
+  end
+
+  def find_rule(name)
+    if name == :root
+      @root
+    else
+      @rules.detect { |rule| rule.name == name }
+    end
   end
 end

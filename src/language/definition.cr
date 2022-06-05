@@ -1,9 +1,11 @@
 class Language
   class Definition
-    @name : Symbol
+    class NoRuleFound < Exception
+    end
+
     @atom : Atom
 
-    def initialize(name)
+    def initialize(@name : Symbol, @language : Language)
       @name = name
       @atom = Atom.new
     end
@@ -18,6 +20,15 @@ class Language
 
     def parse(input)
       @atom.parse(input)
+    end
+
+    macro method_missing(method)
+      {% if method != method %}
+        {% p method %}
+        def {{method}}
+          @language.find_rule(method)
+        end
+      {% end %}
     end
   end
 end

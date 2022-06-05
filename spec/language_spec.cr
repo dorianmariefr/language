@@ -54,4 +54,39 @@ describe Language do
       language.parse("false").should eq({ :boolean => "false" })
     end
   end
+
+  context "string" do
+    language = Language.create do
+      rule(:a) do
+        str("a")
+      end
+
+      root do
+        # (double_quoted_string | single_quoted_string).aka(:string)
+        a
+      end
+
+#       rule(:double_quoted_string) do
+#         double_quote.ignore >> double_quoted_string_character.repeat >> double_quote.ignore
+#       end
+#
+#       rule(:single_quoted_string) do
+#         double_quote.ignore >> single_quoted_string_character.repeat >> single_quote.ignore
+#       end
+#
+#       rule(:double_quote) { str("\"") }
+#       rule(:single_quote) { str("'") }
+#       rule(:escape) { str("\\") }
+#
+#       rule(:double_quoted_string_character) do
+#         (double_quote.absent >> escape.absent >> any) |
+#           (escape >> any)
+#       end
+#
+#       rule(:single_quoted_string_character) do
+#         (single_quote.absent >> escape.absent >> any) |
+#           (escape >> any)
+#       end
+    end
+  end
 end

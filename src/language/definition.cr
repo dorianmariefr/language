@@ -24,7 +24,8 @@ class Language
 
     macro method_missing(method)
       def {{method}}
-        @language.find_atom({{method.symbolize}})
+        @language.find_atom({{method.symbolize}}) ||
+          raise NoRuleFound.new({{method.stringify}})
       end
     end
   end

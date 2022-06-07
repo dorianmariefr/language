@@ -1,5 +1,7 @@
 class Language
   class Rule
+    def_clone
+
     getter name
     getter atom
 

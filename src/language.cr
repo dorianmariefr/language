@@ -3,6 +3,10 @@ require "./language/atom"
 require "./language/definition"
 require "./language/rule"
 
+def debug(string)
+  puts string if !!ENV.fetch("DEBUG", "").presence
+end
+
 class Language
   VERSION = "0.1.0"
 

@@ -1,6 +1,12 @@
 require "spec"
 require "../src/language"
 
+macro expect_interupt
+  expect_raises(Language::Parser::Interuption) do
+    {{yield}}
+  end
+end
+
 describe Language do
   context "text" do
     language = Language.create do
@@ -10,9 +16,9 @@ describe Language do
     end
 
     it "parses" do
-      language.parse("Hello World").should eq({ :text => "Hello World" })
-      language.parse("").should eq({ :text => "" })
-      language.parse("\n").should eq({ :text => "\n" })
+      language.parse("Hello World").should eq({:text => "Hello World"})
+      language.parse("").should eq({:text => ""})
+      language.parse("\n").should eq({:text => "\n"})
     end
   end
 
@@ -24,19 +30,15 @@ describe Language do
     end
 
     it %(parses "nothing") do
-      language.parse("nothing").should eq({ :nothing => "nothing" })
+      language.parse("nothing").should eq({:nothing => "nothing"})
     end
 
     it %(doesn't parse "anothing") do
-      expect_raises(Language::Parser::Interuption) do
-        language.parse("anothing")
-      end
+      expect_interupt { language.parse("anothing") }
     end
 
     it %(doesn't parse "nothinga") do
-      expect_raises(Language::Parser::Interuption) do
-        language.parse("nothinga")
-      end
+      expect_interupt { language.parse("nothinga") }
     end
   end
 
@@ -48,11 +50,11 @@ describe Language do
     end
 
     it %(parses "true") do
-      language.parse("true").should eq({ :boolean => "true" })
+      language.parse("true").should eq({:boolean => "true"})
     end
 
     it %(parses "false") do
-      language.parse("false").should eq({ :boolean => "false" })
+      language.parse("false").should eq({:boolean => "false"})
     end
   end
 
@@ -77,7 +79,7 @@ describe Language do
       end
 
       rule(:single_quoted_string) do
-        double_quote.ignore >> single_quoted_string_character.repeat >> single_quote.ignore
+        single_quote.ignore >> single_quoted_string_character.repeat >> single_quote.ignore
       end
 
       root do
@@ -85,8 +87,48 @@ describe Language do
       end
     end
 
-    it %(parses "hello"), focus: true do
-      language.parse(%("hello")).should eq({ :string => "hello" })
+    it %(parses "hello") do
+      language.parse(%("hello")).should eq({:string => "hello"})
+    end
+
+    it %(parses "") do
+      language.parse(%("")).should eq({:string => ""})
+    end
+
+    it %(parses 'hello') do
+      language.parse(%('hello')).should eq({:string => "hello"})
+    end
+
+    it %(parses '') do
+      language.parse(%('')).should eq({:string => ""})
+    end
+
+    it %(parses "hello\\nworld") do
+      language.parse(%("hello\nworld")).should eq({:string => "hello\nworld"})
+    end
+
+    it %(parses 'hello\nworld') do
+      language.parse(%('hello\nworld')).should eq({:string => "hello\nworld"})
+    end
+
+    it %(doesn't parses "\\") do
+      expect_interupt { language.parse(%("\\")) }
+    end
+
+    it %(doesn't parses ") do
+      expect_interupt { language.parse(%(")) }
+    end
+
+    it %(doesn't parses '\\') do
+      expect_interupt { language.parse(%('\\')) }
+    end
+
+    it %(doesn't parses ') do
+      expect_interupt { language.parse(%(')) }
+    end
+
+    it %(doesn't parses a) do
+      expect_interupt { language.parse(%(a)) }
     end
   end
 end

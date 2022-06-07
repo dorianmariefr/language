@@ -1,5 +1,9 @@
+require "colorize"
+
 class Language
   class Atom
+    def_clone
+
     class None < Atom
       def initialize(@parent : Atom? = nil)
       end
@@ -10,8 +14,17 @@ class Language
       end
 
       def parse(parser)
+        debug "#{parser.h} atom #{self}"
         @parent.not_nil!.parse(parser) if @parent
         parser.any
+      end
+
+      def to_s(io)
+        if @parent
+          "#{@parent}.any".to_s(io)
+        else
+          "any".to_s(io)
+        end
       end
     end
 
@@ -20,12 +33,21 @@ class Language
       end
 
       def parse(parser)
+        debug "#{parser.h} atom #{self}"
         return parser unless @parent
 
         loop do
           @parent.not_nil!.parse(parser)
         end
       rescue Parser::Interuption
+      end
+
+      def to_s(io)
+        if @parent
+          "#{@parent}.repeat".to_s(io)
+        else
+          "repeat".to_s(io)
+        end
       end
     end
 
@@ -34,8 +56,17 @@ class Language
       end
 
       def parse(parser)
+        debug "#{parser.h} atom #{self}"
         @parent.not_nil!.parse(parser) if @parent
         parser.str(@string)
+      end
+
+      def to_s(io)
+        if @parent
+          "#{@parent}.str(#{@string.inspect})".to_s(io)
+        else
+          "str(#{@string.inspect})".to_s(io)
+        end
       end
     end
 
@@ -44,10 +75,20 @@ class Language
       end
 
       def parse(parser)
-        @parent.not_nil!.parse(parser.dup) if @parent
+        debug "#{parser.h} atom #{self}"
+        clone = parser.copy(atom: self)
+        @parent.not_nil!.parse(clone) if @parent
       rescue Parser::Interuption
       else
         raise Parser::Interuption.new(parser)
+      end
+
+      def to_s(io)
+        if @parent
+          "#{@parent}.absent".to_s(io)
+        else
+          "absent".to_s(io)
+        end
       end
     end
 
@@ -56,7 +97,18 @@ class Language
       end
 
       def parse(parser)
-        @parent.not_nil!.parse(parser.dup) if @parent
+        debug "#{parser.h} atom #{self}"
+        clone = parser.copy(atom: self)
+        @parent.not_nil!.parse(clone) if @parent
+        parser.cursor = clone.cursor
+      end
+
+      def to_s(io)
+        if @parent
+          "#{@parent}.ignore".to_s(io)
+        else
+          "ignore".to_s(io)
+        end
       end
     end
 
@@ -65,8 +117,13 @@ class Language
       end
 
       def parse(parser)
+        debug "#{parser.h} atom #{self}"
         @parent.not_nil!.parse(parser) if @parent
         parser.aka(@name)
+      end
+
+      def to_s(io)
+        "aka(#{@name.inspect})".to_s(io)
       end
     end
 
@@ -75,9 +132,22 @@ class Language
       end
 
       def parse(parser)
-        @left.not_nil!.parse(parser)
-      rescue Parser::Interuption
-        @right.not_nil!.parse(parser)
+        debug "#{parser.h} atom #{self}"
+        left_clone = parser.copy(atom: self)
+        right_clone = parser.copy(atom: self)
+
+        begin
+          @left.not_nil!.parse(left_clone)
+          parser.merge(left_clone)
+        rescue Parser::Interuption
+          debug "#{parser.h} atom #{self} #{"interupted".colorize(:red)}"
+          @right.not_nil!.parse(right_clone)
+          parser.merge(right_clone)
+        end
+      end
+
+      def to_s(io)
+        "((#{@left}) | (#{@right}))".to_s(io)
       end
     end
 
@@ -86,8 +156,13 @@ class Language
       end
 
       def parse(parser)
+        debug "#{parser.h} atom #{self}"
         @left.not_nil!.parse(parser)
         @right.not_nil!.parse(parser)
+      end
+
+      def to_s(io)
+        "#{@left} >> #{@right}".to_s(io)
       end
     end
 

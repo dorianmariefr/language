@@ -1,4 +1,5 @@
-require "./spec_helper"
+require "spec"
+require "../src/language"
 
 describe Language do
   context "text" do
@@ -27,13 +28,13 @@ describe Language do
     end
 
     it %(doesn't parse "anothing") do
-      expect_raises(Language::Atom::Str::NotFound) do
+      expect_raises(Language::Parser::Interuption) do
         language.parse("anothing")
       end
     end
 
     it %(doesn't parse "nothinga") do
-      expect_raises(Language::Parser::NotEndOfInput) do
+      expect_raises(Language::Parser::Interuption) do
         language.parse("nothinga")
       end
     end
@@ -82,6 +83,10 @@ describe Language do
       root do
         (double_quoted_string | single_quoted_string).aka(:string)
       end
+    end
+
+    it %(parses "hello"), focus: true do
+      language.parse(%("hello")).should eq({ :string => "hello" })
     end
   end
 end

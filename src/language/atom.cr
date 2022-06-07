@@ -11,7 +11,7 @@ class Language
 
       def parse(parser)
         @parent.not_nil!.parse(parser) if @parent
-        parser.consume(1)
+        parser.any
       end
     end
 
@@ -30,20 +30,43 @@ class Language
     end
 
     class Str < Atom
-      class NotFound < Parser::Interuption
-      end
-
       def initialize(@string : String, @parent : Atom? = nil)
       end
 
       def parse(parser)
         @parent.not_nil!.parse(parser) if @parent
+        parser.str(@string)
+      end
+    end
 
-        if parser.next?(@string)
-          parser.consume(@string.size)
-        else
-          raise NotFound.new("expected #{@string}")
-        end
+    class Absent < Atom
+      def initialize(@parent : Atom? = nil)
+      end
+
+      def parse(parser)
+        @parent.not_nil!.parse(parser.dup) if @parent
+      rescue Parser::Interuption
+      else
+        raise Parser::Interuption.new(parser)
+      end
+    end
+
+    class Ignore < Atom
+      def initialize(@parent : Atom? = nil)
+      end
+
+      def parse(parser)
+        @parent.not_nil!.parse(parser.dup) if @parent
+      end
+    end
+
+    class Aka < Atom
+      def initialize(@name : Symbol, @parent : Atom? = nil)
+      end
+
+      def parse(parser)
+        @parent.not_nil!.parse(parser) if @parent
+        parser.aka(@name)
       end
     end
 
@@ -58,13 +81,13 @@ class Language
       end
     end
 
-    class Aka < Atom
-      def initialize(@name : Symbol, @parent : Atom? = nil)
+    class And < Atom
+      def initialize(@left : Atom? = nil, @right : Atom? = nil)
       end
 
       def parse(parser)
-        @parent.not_nil!.parse(parser) if @parent
-        parser.aka(@name)
+        @left.not_nil!.parse(parser)
+        @right.not_nil!.parse(parser)
       end
     end
 
@@ -79,6 +102,14 @@ class Language
       Str.new(string)
     end
 
+    def absent
+      Absent.new(parent: self)
+    end
+
+    def ignore
+      Ignore.new(parent: self)
+    end
+
     def repeat
       Repeat.new(parent: self)
     end
@@ -89,6 +120,14 @@ class Language
 
     def |(other)
       Or.new(left: self, right: other)
+    end
+
+    def >>(other)
+      And.new(left: self, right: other)
+    end
+
+    def <<(other)
+      And.new(left: self, right: other)
     end
 
     def parse(parser)

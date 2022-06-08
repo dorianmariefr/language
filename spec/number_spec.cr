@@ -52,14 +52,14 @@ end
 
 describe number do
   it "parses 0" do
-    number.parse("0").should eq({ :number => "0" })
+    number.parse("0").should eq({ :number => { :whole => "0" } })
   end
 
   it "parses 1" do
-    number.parse("1").should eq({ :number => "1" })
+    number.parse("1").should eq({ :number => { :whole => "1" } })
   end
 
   it "parses 1923" do
-    number.parse("1923").should eq({ :number => "1923" })
+    number.parse("1923").should eq({ :number => { :whole => "1923" } })
   end
 end

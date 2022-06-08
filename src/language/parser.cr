@@ -64,7 +64,8 @@ class Language
     end
 
     alias Output = String |
-                   Hash(Symbol, Output)
+                   Hash(Symbol, Output) |
+                   Hash(Symbol, Hash(Symbol, Output))
 
     getter input : String
     getter buffer : String
@@ -140,11 +141,17 @@ class Language
 
     def aka(name)
       debug "#{h} parser aka(#{name.inspect})"
+
       if @output.is_a?(String)
         @output = {} of Symbol => Output
       end
 
-      @output.as(Hash(Symbol, Output))[name] = @buffer
+      if @output.empty?
+        @output.as(Hash(Symbol, Output))[name] = @buffer
+      else
+        @output = { name => @output }
+      end
+
       @buffer = ""
     end
 

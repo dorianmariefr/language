@@ -112,6 +112,25 @@ class Language
       end
     end
 
+    class Maybe < Atom
+      def initialize(@parent : Atom? = nil)
+      end
+
+      def parse(parser)
+        debug "#{parser.h} atom #{self}"
+        @parent.not_nil!.parse(parser) if @parent
+      rescue Parser::Interuption
+      end
+
+      def to_s(io)
+        if @parent
+          "#{@parent}.maybe".to_s(io)
+        else
+          "maybe".to_s(io)
+        end
+      end
+    end
+
     class Aka < Atom
       def initialize(@name : Symbol, @parent : Atom? = nil)
       end
@@ -183,6 +202,10 @@ class Language
 
     def ignore
       Ignore.new(parent: self)
+    end
+
+    def maybe
+      Maybe.new(parent: self)
     end
 
     def repeat

@@ -14,7 +14,6 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         @parent.not_nil!.parse(parser) if @parent
         parser.any
       end
@@ -29,24 +28,38 @@ class Language
     end
 
     class Repeat < Atom
-      def initialize(@parent : Atom? = nil)
+      def initialize(@parent : Atom? = nil, @min : Int32 = 0, @max : Int32? = nil)
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         return parser unless @parent
 
-        loop do
+        @min.times do
           @parent.not_nil!.parse(parser)
         end
-      rescue Parser::Interuption
+
+        if @max.nil?
+          begin
+            loop do
+              @parent.not_nil!.parse(parser)
+            end
+          rescue Parser::Interuption
+          end
+        else
+          (@max.not_nil! - @min).times do
+            @parent.not_nil!.parse(parser)
+          end
+        end
       end
 
       def to_s(io)
+        min = @min.zero? ? "" : @min.to_s
+        max = @max.nil? ? "" : ", #{@max}"
+        parenthesis = min.empty? && max.empty? ? "" : "(#{min}#{max})"
         if @parent
-          "#{@parent}.repeat".to_s(io)
+          "#{@parent}.repeat#{parenthesis}".to_s(io)
         else
-          "repeat".to_s(io)
+          "repeat#{parenthesis}".to_s(io)
         end
       end
     end
@@ -56,7 +69,6 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         @parent.not_nil!.parse(parser) if @parent
         parser.str(@string)
       end
@@ -75,7 +87,6 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         clone = parser.copy(atom: self)
         @parent.not_nil!.parse(clone) if @parent
       rescue Parser::Interuption
@@ -97,7 +108,6 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         clone = parser.copy(atom: self)
         @parent.not_nil!.parse(clone) if @parent
         parser.cursor = clone.cursor
@@ -117,7 +127,6 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         @parent.not_nil!.parse(parser) if @parent
       rescue Parser::Interuption
       end
@@ -136,7 +145,6 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         @parent.not_nil!.parse(parser) if @parent
         parser.aka(@name)
       end
@@ -151,7 +159,6 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
         left_clone = parser.copy(atom: self)
         right_clone = parser.copy(atom: self)
 
@@ -159,7 +166,6 @@ class Language
           @left.not_nil!.parse(left_clone)
           parser.merge(left_clone)
         rescue Parser::Interuption
-          debug "#{parser.h} atom #{self} #{"interupted".colorize(:red)}"
           @right.not_nil!.parse(right_clone)
           parser.merge(right_clone)
         end
@@ -175,7 +181,11 @@ class Language
       end
 
       def parse(parser)
-        debug "#{parser.h} atom #{self}"
+        puts ">>"
+        puts "  LEFT"
+        puts "    " + @left.to_s
+        puts "  RIGHT"
+        puts "    " + @right.to_s
         @left.not_nil!.parse(parser)
         @right.not_nil!.parse(parser)
       end
@@ -208,8 +218,8 @@ class Language
       Maybe.new(parent: self)
     end
 
-    def repeat
-      Repeat.new(parent: self)
+    def repeat(min = 0, max = nil)
+      Repeat.new(parent: self, min: min, max: max)
     end
 
     def aka(name)

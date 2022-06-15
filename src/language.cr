@@ -1,11 +1,9 @@
+require "./language/parser/interuption"
 require "./language/parser"
 require "./language/atom"
 require "./language/definition"
 require "./language/rule"
-
-def debug(string)
-  puts string if !!ENV.fetch("DEBUG", "").presence
-end
+require "./language/output"
 
 class Language
   VERSION = "0.1.0"

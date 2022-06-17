@@ -2,9 +2,9 @@ class Language
   class Parser
     def_clone
 
-    getter input : String
-    getter buffer : String
-    getter output : Output
+    property input : String
+    property buffer : String
+    property output : Output
     property root : Rule
     property cursor : Int32
 
@@ -25,7 +25,7 @@ class Language
     def merge(parser)
       @cursor = parser.cursor
       @buffer = parser.buffer
-      @output = parser.output
+      @output.merge(parser.output)
     end
 
     def parse
@@ -35,18 +35,6 @@ class Language
         @output
       else
         raise NotEndOfInput.new(self)
-      end
-    end
-
-    def any
-      consume(1)
-    end
-
-    def str(string)
-      if next?(string)
-        consume(string.size)
-      else
-        raise Str::NotFound.new(self, string: string)
       end
     end
 
@@ -61,7 +49,7 @@ class Language
 
     def aka(name)
       if @buffer.empty?
-        @output = Output.new({name => @output})
+        @output = Output.new({ name => @output })
       else
         @output[name] = Output.new(@buffer)
         @buffer = ""
@@ -73,7 +61,7 @@ class Language
     end
 
     def buffer?
-      !!@buffer.presence
+      @buffer != ""
     end
   end
 end

@@ -28,7 +28,7 @@ string = Language.create do
   end
 end
 
-describe string do
+describe "string" do
   it %(parses "hello") do
     string.parse(%("hello")).should eq({:string => "hello"})
   end

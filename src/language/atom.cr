@@ -15,7 +15,7 @@ class Language
 
       def parse(parser)
         @parent.not_nil!.parse(parser) if @parent
-        parser.any
+        parser.consume(1)
       end
 
       def to_s(io)
@@ -56,6 +56,7 @@ class Language
         min = @min.zero? ? "" : @min.to_s
         max = @max.nil? ? "" : ", #{@max}"
         parenthesis = min.empty? && max.empty? ? "" : "(#{min}#{max})"
+
         if @parent
           "#{@parent}.repeat#{parenthesis}".to_s(io)
         else
@@ -70,7 +71,12 @@ class Language
 
       def parse(parser)
         @parent.not_nil!.parse(parser) if @parent
-        parser.str(@string)
+
+        if parser.next?(@string)
+          parser.consume(@string.size)
+        else
+          raise Parser::Str::NotFound.new(parser, string: @string)
+        end
       end
 
       def to_s(io)
@@ -145,8 +151,17 @@ class Language
       end
 
       def parse(parser)
-        @parent.not_nil!.parse(parser) if @parent
-        parser.aka(@name)
+        if @parent
+          parser.buffer = ""
+          @parent.not_nil!.parse(parser)
+        end
+
+        if parser.buffer?
+          parser.output[@name] = Output.new(parser.buffer)
+          parser.buffer = ""
+        else
+          parser.output = Output.new({ @name => parser.output })
+        end
       end
 
       def to_s(io)
@@ -181,13 +196,10 @@ class Language
       end
 
       def parse(parser)
-        puts ">>"
-        puts "  LEFT"
-        puts "    " + @left.to_s
-        puts "  RIGHT"
-        puts "    " + @right.to_s
         @left.not_nil!.parse(parser)
-        @right.not_nil!.parse(parser)
+        right_clone = parser.copy(atom: self)
+        @right.not_nil!.parse(right_clone)
+        parser.merge(right_clone)
       end
 
       def to_s(io)

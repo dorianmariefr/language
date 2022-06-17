@@ -18,6 +18,18 @@ class Language
       end
     end
 
+    def merge(other)
+      if other.raw.is_a?(Hash(Symbol, Output))
+        if @raw.is_a?(String)
+          @raw = {} of Symbol => Output
+        end
+
+        other.raw.as(Hash(Symbol, Output)).each do |key, value|
+          @raw.as(Hash(Symbol, Output))[key] = value
+        end
+      end
+    end
+
     def ==(other : Output)
       raw == other.raw
     end

@@ -50,7 +50,7 @@ number = Language.create do
   end
 end
 
-describe number do
+describe "number" do
   it "parses 0" do
     number.parse("0").should eq({:number => {:whole => "0"}})
   end

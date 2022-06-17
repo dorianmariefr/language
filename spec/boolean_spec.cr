@@ -6,7 +6,7 @@ boolean = Language.create do
   end
 end
 
-describe boolean do
+describe "boolean" do
   it %(parses "true") do
     boolean.parse("true").should eq({:boolean => "true"})
   end

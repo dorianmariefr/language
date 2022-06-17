@@ -6,7 +6,7 @@ nothing = Language.create do
   end
 end
 
-describe nothing do
+describe "nothing" do
   it %(parses "nothing") do
     nothing.parse("nothing").should eq({:nothing => "nothing"})
   end

@@ -118,4 +118,12 @@ describe "number" do
   it "doesn't parse +1" do
     expect_interupt { number.parse("+1") }
   end
+
+  it "doesn't parse 01" do
+    expect_interupt { number.parse("01") }
+  end
+
+  it "doesn't parse 1." do
+    expect_interupt { number.parse("1.") }
+  end
 end

@@ -151,17 +151,22 @@ class Language
       end
 
       def parse(parser)
+        clone = parser.copy(atom: self)
+
         if @parent
-          parser.buffer = ""
-          @parent.not_nil!.parse(parser)
+          clone.buffer = ""
+          clone.output = Output.new
+          @parent.not_nil!.parse(clone)
         end
 
-        if parser.buffer?
-          parser.output[@name] = Output.new(parser.buffer)
+        if clone.buffer?
+          parser.output[@name] = Output.new(clone.buffer)
           parser.buffer = ""
         else
-          parser.output = Output.new({ @name => parser.output })
+          parser.output = Output.new({ @name => clone.output })
         end
+
+        parser.cursor = clone.cursor
       end
 
       def to_s(io)
@@ -252,6 +257,10 @@ class Language
 
     def parse(parser)
       raise NotImplementedError.new("#{self.class}#parse")
+    end
+
+    def inspect(io)
+      to_s(io)
     end
   end
 end

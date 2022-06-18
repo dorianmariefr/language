@@ -104,17 +104,18 @@ describe "number" do
     })
   end
 
-  it "parses 1.20e+10" do
-    number.parse("1.20e+10").should eq({
+  it "parses -1.2e+3" do
+    number.parse("-1.2e+3").should eq({
       :number => {
+        :sign => "-",
         :whole => "1",
-        :fraction => "20",
-        :exponent => { :sign => "+", :whole => "10" }
+        :fraction => "2",
+        :exponent => { :sign => "+", :whole => "3" }
       }
     })
   end
 
-  it "doesn't parse -1" do
-    expect_interupt { number.parse("-1") }
+  it "doesn't parse +1" do
+    expect_interupt { number.parse("+1") }
   end
 end

@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-Code::String = Language.create do
+string = Language.create do
   rule(:double_quote) { str("\"") }
   rule(:single_quote) { str("'") }
   rule(:escape) { str("\\") }
@@ -30,46 +30,46 @@ end
 
 describe "string" do
   it %(parses "hello") do
-    Code::String.parse(%("hello")).should eq({:string => "hello"})
+    string.parse(%("hello")).should eq({:string => "hello"})
   end
 
   it %(parses "") do
-    Code::String.parse(%("")).should eq({:string => ""})
+    string.parse(%("")).should eq({:string => ""})
   end
 
   it %(parses 'hello') do
-    Code::String.parse(%('hello')).should eq({:string => "hello"})
+    string.parse(%('hello')).should eq({:string => "hello"})
   end
 
   it %(parses '') do
-    Code::String.parse(%('')).should eq({:string => ""})
+    string.parse(%('')).should eq({:string => ""})
   end
 
   it %(parses "hello\\nworld") do
-    Code::String.parse(%("hello\nworld")).should eq({:string => "hello\nworld"})
+    string.parse(%("hello\nworld")).should eq({:string => "hello\nworld"})
   end
 
   it %(parses 'hello\nworld') do
-    Code::String.parse(%('hello\nworld')).should eq({:string => "hello\nworld"})
+    string.parse(%('hello\nworld')).should eq({:string => "hello\nworld"})
   end
 
   it %(doesn't parses "\\") do
-    expect_interupt { Code::String.parse(%("\\")) }
+    expect_interupt { string.parse(%("\\")) }
   end
 
   it %(doesn't parses ") do
-    expect_interupt { Code::String.parse(%(")) }
+    expect_interupt { string.parse(%(")) }
   end
 
   it %(doesn't parses '\\') do
-    expect_interupt { Code::String.parse(%('\\')) }
+    expect_interupt { string.parse(%('\\')) }
   end
 
   it %(doesn't parses ') do
-    expect_interupt { Code::String.parse(%(')) }
+    expect_interupt { string.parse(%(')) }
   end
 
   it %(doesn't parses a) do
-    expect_interupt { Code::String.parse(%(a)) }
+    expect_interupt { string.parse(%(a)) }
   end
 end

@@ -243,10 +243,6 @@ class Language
       Aka.new(parent: self, name: name)
     end
 
-    def |(other : Language)
-      Or.new(left: self, right: other.atom)
-    end
-
     def |(other)
       Or.new(left: self, right: other)
     end

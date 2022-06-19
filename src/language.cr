@@ -48,8 +48,4 @@ class Language
     rule = find_rule(name)
     rule ? rule.not_nil!.atom : nil
   end
-
-  def atom
-    @root.atom
-  end
 end

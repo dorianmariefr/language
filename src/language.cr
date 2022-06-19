@@ -6,6 +6,8 @@ require "./language/rule"
 require "./language/output"
 
 class Language
+  def_clone
+
   VERSION = "0.1.0"
 
   @root : Rule
@@ -45,5 +47,9 @@ class Language
   def find_atom(name)
     rule = find_rule(name)
     rule ? rule.not_nil!.atom : nil
+  end
+
+  def atom
+    @root.atom
   end
 end

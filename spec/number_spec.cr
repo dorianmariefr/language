@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-number = Language.create do
+Code::Number = Language.create do
   rule(:minus) { str("-") }
   rule(:plus) { str("+") }
   rule(:dot) { str(".") }
@@ -50,25 +50,25 @@ number = Language.create do
   end
 end
 
-describe "number" do
+describe "Code::Number" do
   it "parses 0" do
-    number.parse("0").should eq({:number => {:whole => "0"}})
+    Code::Number.parse("0").should eq({:number => {:whole => "0"}})
   end
 
   it "parses 1" do
-    number.parse("1").should eq({:number => {:whole => "1"}})
+    Code::Number.parse("1").should eq({:number => {:whole => "1"}})
   end
 
   it "parses 1923" do
-    number.parse("1923").should eq({:number => {:whole => "1923"}})
+    Code::Number.parse("1923").should eq({:number => {:whole => "1923"}})
   end
 
   it "parses -1923" do
-    number.parse("-1923").should eq({:number => {:sign => "-", :whole => "1923"}})
+    Code::Number.parse("-1923").should eq({:number => {:sign => "-", :whole => "1923"}})
   end
 
   it "parses -10.20" do
-    number.parse("-10.20").should eq({
+    Code::Number.parse("-10.20").should eq({
       :number => {
         :sign => "-",
         :whole => "10",
@@ -78,7 +78,7 @@ describe "number" do
   end
 
   it "parses 1e10" do
-    number.parse("1e10").should eq({
+    Code::Number.parse("1e10").should eq({
       :number => {
         :whole => "1",
         :exponent => { :whole => "10" }
@@ -87,7 +87,7 @@ describe "number" do
   end
 
   it "parses 1e-10" do
-    number.parse("1e-10").should eq({
+    Code::Number.parse("1e-10").should eq({
       :number => {
         :whole => "1",
         :exponent => { :sign => "-", :whole => "10" }
@@ -96,7 +96,7 @@ describe "number" do
   end
 
   it "parses 1e+10" do
-    number.parse("1e+10").should eq({
+    Code::Number.parse("1e+10").should eq({
       :number => {
         :whole => "1",
         :exponent => { :sign => "+", :whole => "10" }
@@ -105,7 +105,7 @@ describe "number" do
   end
 
   it "parses -1.2e+3" do
-    number.parse("-1.2e+3").should eq({
+    Code::Number.parse("-1.2e+3").should eq({
       :number => {
         :sign => "-",
         :whole => "1",
@@ -116,14 +116,14 @@ describe "number" do
   end
 
   it "doesn't parse +1" do
-    expect_interupt { number.parse("+1") }
+    expect_interupt { Code::Number.parse("+1") }
   end
 
   it "doesn't parse 01" do
-    expect_interupt { number.parse("01") }
+    expect_interupt { Code::Number.parse("01") }
   end
 
   it "doesn't parse 1." do
-    expect_interupt { number.parse("1.") }
+    expect_interupt { Code::Number.parse("1.") }
   end
 end

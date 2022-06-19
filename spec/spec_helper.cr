@@ -6,3 +6,6 @@ macro expect_interupt
     {{yield}}
   end
 end
+
+class Code
+end

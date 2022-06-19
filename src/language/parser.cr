@@ -32,7 +32,11 @@ class Language
       @root.parse(self)
 
       if @cursor == @input.size
-        @output
+        if @output == ""
+          @buffer
+        else
+          @output
+        end
       else
         raise NotEndOfInput.new(self)
       end

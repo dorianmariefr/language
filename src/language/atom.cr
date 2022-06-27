@@ -32,22 +32,22 @@ class Language
       end
 
       def parse(parser)
-        return parser unless @parent
+        return unless @parent
 
         @min.times do
-          @parent.not_nil!.parse(parser)
+          match(parser)
         end
 
         if @max.nil?
           begin
             loop do
-              @parent.not_nil!.parse(parser)
+              match(parser)
             end
           rescue Parser::Interuption
           end
         else
           (@max.not_nil! - @min).times do
-            @parent.not_nil!.parse(parser)
+            match(parser)
           end
         end
       end
@@ -62,6 +62,15 @@ class Language
         else
           "repeat#{parenthesis}".to_s(io)
         end
+      end
+
+      private def match(parser)
+        clone = parser.copy(atom: self)
+        clone.output = Output.new
+        @parent.not_nil!.parse(clone)
+        parser.cursor = clone.cursor
+        parser.buffer = clone.buffer
+        parser.output << clone.output
       end
     end
 

@@ -2,30 +2,84 @@ class Language
   class Output
     def_clone
 
-    alias Type = String | Hash(Symbol, Output)
+    alias Type = String | Array(Output) | Hash(Symbol, Output)
 
     getter raw : Type
 
     def initialize(@raw : Type = "")
     end
 
-    def []=(key, value)
+    def []=(key : Symbol, value : Output)
       case @raw
       when String
         @raw = { key => value }
+      when Array(Output)
+        @raw.as(Array(Output)) << Output.new({ key => value })
       when Hash(Symbol, Output)
         @raw.as(Hash(Symbol, Output))[key] = value
       end
     end
 
-    def merge(other)
-      if other.raw.is_a?(Hash(Symbol, Output))
-        if @raw.is_a?(String)
-          @raw = {} of Symbol => Output
+    def merge(other : Output)
+      case @raw
+      when String
+        case other.raw
+        when String
+          @raw = @raw.as(String) + other.raw.as(String)
+        when Array(Output)
+          @raw = other.raw
+        when Hash(Symbol, Output)
+          @raw = other.raw
         end
+      when Array(Output)
+        case other.raw
+        when String
+          return
+        when Array(Output)
+          @raw = other.raw
+        when Hash(Symbol, Output)
+          @raw.as(Array(Output)) << other
+        end
+      when Hash(Symbol, Output)
+        case other.raw
+        when String
+          return
+        when Array(Output)
+          return
+        when Hash(Symbol, Output)
+          @raw.as(Hash(Symbol, Output)).merge!(other.raw.as(Hash(Symbol, Output)))
+        end
+      end
+    end
 
-        other.raw.as(Hash(Symbol, Output)).each do |key, value|
-          @raw.as(Hash(Symbol, Output))[key] = value
+    def <<(other)
+      case @raw
+      when String
+        case other.raw
+        when String
+          @raw = @raw.as(String) + other.raw.as(String)
+        when Array(Output)
+          @raw = other.raw
+        when Hash(Symbol, Output)
+          @raw = [other]
+        end
+      when Array(Output)
+        case other.raw
+        when String
+          @raw.as(Array(Output)) << other
+        when Array(Output)
+          @raw = @raw.as(Array(Output)) + other.raw.as(Array(Output))
+        when Hash(Symbol, Output)
+          @raw.as(Array(Output)) << other
+        end
+      when Hash(Symbol, Output)
+        case other.raw
+        when String
+          return
+        when Array(Output)
+          return
+        when Hash(Symbol, Output)
+          @raw.as(Hash(Symbol, Output)).merge!(other.raw.as(Hash(Symbol, Output)))
         end
       end
     end

@@ -1,5 +1,9 @@
 require "./spec_helper"
 
+def eq_code(expected)
+  eq([{:code => expected}])
+end
+
 template = Language.create do
   rule(:minus) { str("-") }
   rule(:plus) { str("+") }
@@ -21,16 +25,22 @@ template = Language.create do
   rule(:opening_bracket) { str("{") }
   rule(:closing_bracket) { str("}") }
 
+  # name
+
+  rule(:name) do
+    (dot.absent >> opening_bracket.absent >> closing_bracket.absent >> any).repeat.aka(:name)
+  end
+
   # nothing
 
   rule(:nothing) do
-    str("nothing").aka(:nothing)
+    str("nothing").aka(:nothing) | name
   end
 
   # boolean
 
   rule(:boolean) do
-    (str("true") | str("false")).aka(:boolean)
+    (str("true") | str("false")).aka(:boolean) | nothing
   end
 
   # number
@@ -65,7 +75,7 @@ template = Language.create do
         whole.aka(:whole) >>
         fraction.aka(:fraction).maybe >>
         exponent.aka(:exponent).maybe
-    ).aka(:number)
+    ).aka(:number) | boolean
   end
 
   # string
@@ -89,13 +99,19 @@ template = Language.create do
   end
 
   rule(:string) do
-    (double_quoted_string | single_quoted_string).aka(:string)
+    (double_quoted_string | single_quoted_string).aka(:string) | number
+  end
+
+  # call
+
+  rule(:call) do
+    (string.aka(:left) >> dot >> string.aka(:right)).aka(:call) | string
   end
 
   # code
 
   rule(:code) do
-    nothing | boolean | number | string
+    call
   end
 
   # text
@@ -124,15 +140,35 @@ end
 
 describe "template" do
   it %(parses "Hello world") do
-    template.parse("Hello world").should eq([{ :text => "Hello world" }])
+    template.parse("Hello world").should eq([{:text => "Hello world"}])
   end
 
   it %(parses "1 = {1}") do
     template.parse("1 = {1}").should eq(
       [
-        { :text => "1 = " },
-        { :code => { :number => { :whole => "1" } } }
+        {:text => "1 = "},
+        {:code => {:number => {:whole => "1"}}},
       ]
     )
+  end
+
+  it %(parses "{1}") do
+    template.parse("{1}").should eq_code({:number => {:whole => "1"}})
+  end
+
+  it %(parses "{"hello"}") do
+    template.parse("{\"hello\"}").should eq_code({:string => "hello"})
+  end
+
+  it %(parses "{true}") do
+    template.parse("{true}").should eq_code({:boolean => "true"})
+  end
+
+  it %(parses "{nothing}") do
+    template.parse("{nothing}").should eq_code({:nothing => "nothing"})
+  end
+
+  it %(parses "{first_name}") do
+    template.parse("{first_name}").should eq_code({:name => "first_name"})
   end
 end

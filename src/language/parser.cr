@@ -53,7 +53,7 @@ class Language
 
     def aka(name)
       if @buffer.empty?
-        @output = Output.new({ name => @output })
+        @output = Output.new({name => @output})
       else
         @output[name] = Output.new(@buffer)
         @buffer = ""

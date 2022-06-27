@@ -70,48 +70,48 @@ describe "number" do
   it "parses -10.20" do
     number.parse("-10.20").should eq({
       :number => {
-        :sign => "-",
-        :whole => "10",
-        :fraction => "20"
-      }
+        :sign     => "-",
+        :whole    => "10",
+        :fraction => "20",
+      },
     })
   end
 
   it "parses 1e10" do
     number.parse("1e10").should eq({
       :number => {
-        :whole => "1",
-        :exponent => { :whole => "10" }
-      }
+        :whole    => "1",
+        :exponent => {:whole => "10"},
+      },
     })
   end
 
   it "parses 1e-10" do
     number.parse("1e-10").should eq({
       :number => {
-        :whole => "1",
-        :exponent => { :sign => "-", :whole => "10" }
-      }
+        :whole    => "1",
+        :exponent => {:sign => "-", :whole => "10"},
+      },
     })
   end
 
   it "parses 1e+10" do
     number.parse("1e+10").should eq({
       :number => {
-        :whole => "1",
-        :exponent => { :sign => "+", :whole => "10" }
-      }
+        :whole    => "1",
+        :exponent => {:sign => "+", :whole => "10"},
+      },
     })
   end
 
   it "parses -1.2e+3" do
     number.parse("-1.2e+3").should eq({
       :number => {
-        :sign => "-",
-        :whole => "1",
+        :sign     => "-",
+        :whole    => "1",
         :fraction => "2",
-        :exponent => { :sign => "+", :whole => "3" }
-      }
+        :exponent => {:sign => "+", :whole => "3"},
+      },
     })
   end
 

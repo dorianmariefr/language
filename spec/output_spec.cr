@@ -6,8 +6,8 @@ string_two = Language::Output.new("2")
 string_bye = Language::Output.new("Bye")
 array = Language::Output.new([string_bye])
 array_hello = Language::Output.new([string])
-hash = Language::Output.new({ :a => string_one, :hello => string })
-hash_two = Language::Output.new({ :a => string_two })
+hash = Language::Output.new({:a => string_one, :hello => string})
+hash_two = Language::Output.new({:a => string_two})
 
 describe Language::Output do
   describe "[]=" do
@@ -15,7 +15,7 @@ describe Language::Output do
       it "ignores the string" do
         output = string.clone
         output[:a] = string_one
-        output.should eq({ :a => "1" })
+        output.should eq({:a => "1"})
       end
     end
 
@@ -23,7 +23,7 @@ describe Language::Output do
       it "adds a last element" do
         output = array.clone
         output[:a] = string_one
-        output.should eq(["Bye", { :a => "1" }])
+        output.should eq(["Bye", {:a => "1"}])
       end
     end
 
@@ -31,7 +31,7 @@ describe Language::Output do
       it "adds a key value" do
         output = hash.clone
         output[:a] = string_two
-        output.should eq({ :a => "2", :hello => "Hello" })
+        output.should eq({:a => "2", :hello => "Hello"})
       end
     end
   end
@@ -90,7 +90,7 @@ describe Language::Output do
           output = array.clone
           other = hash
           output.merge(other)
-          output.should eq(["Bye", { :a => "1", :hello => "Hello" }])
+          output.should eq(["Bye", {:a => "1", :hello => "Hello"}])
         end
       end
     end
@@ -119,7 +119,7 @@ describe Language::Output do
           output = hash.clone
           other = hash_two
           output.merge(other)
-          output.should eq({ :a => "2", :hello => "Hello" })
+          output.should eq({:a => "2", :hello => "Hello"})
         end
       end
     end
@@ -179,7 +179,7 @@ describe Language::Output do
           output = array.clone
           other = hash_two
           output << other
-          output.should eq(["Bye", { :a => "2" }])
+          output.should eq(["Bye", {:a => "2"}])
         end
       end
     end
@@ -208,7 +208,7 @@ describe Language::Output do
           output = hash.clone
           other = hash_two
           output << other
-          output.should eq({ :a => "2", :hello => "Hello" })
+          output.should eq({:a => "2", :hello => "Hello"})
         end
       end
     end

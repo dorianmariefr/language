@@ -172,7 +172,7 @@ class Language
           parser.output[@name] = Output.new(clone.buffer)
           parser.buffer = ""
         else
-          parser.output = Output.new({ @name => clone.output })
+          parser.output = Output.new({@name => clone.output})
         end
 
         parser.cursor = clone.cursor

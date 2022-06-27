@@ -12,9 +12,9 @@ class Language
     def []=(key : Symbol, value : Output)
       case @raw
       when String
-        @raw = { key => value }
+        @raw = {key => value}
       when Array(Output)
-        @raw.as(Array(Output)) << Output.new({ key => value })
+        @raw.as(Array(Output)) << Output.new({key => value})
       when Hash(Symbol, Output)
         @raw.as(Hash(Symbol, Output))[key] = value
       end

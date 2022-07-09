@@ -15,6 +15,38 @@ class Language
       @raw != ""
     end
 
+    def as_s : String
+      @raw.as(String)
+    end
+
+    def as_a : Array(Output)
+      @raw.as(Array(Output))
+    end
+
+    def as_h : Hash(Symbol, Output)
+      @raw.as(Hash(Symbol, Output))
+    end
+
+    def ==(other : Output)
+      raw == other.raw
+    end
+
+    def ==(other)
+      raw == other
+    end
+
+    def pretty_print(pp)
+      raw.pretty_print(pp)
+    end
+
+    def to_s(io)
+      raw.to_s(io)
+    end
+
+    def inspect(io)
+      raw.inspect(io)
+    end
+
     def []=(key : Symbol, value : Output)
       case @raw
       when String
@@ -88,26 +120,6 @@ class Language
           @raw.as(Hash(Symbol, Output)).merge!(other.raw.as(Hash(Symbol, Output)))
         end
       end
-    end
-
-    def ==(other : Output)
-      raw == other.raw
-    end
-
-    def ==(other)
-      raw == other
-    end
-
-    def pretty_print(pp)
-      raw.pretty_print(pp)
-    end
-
-    def to_s(io)
-      raw.to_s(io)
-    end
-
-    def inspect(io)
-      raw.inspect(io)
     end
   end
 end

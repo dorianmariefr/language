@@ -1,25 +1,22 @@
 class Language
   class Parser
-    def_clone
-
     property input : String
     property buffer : String
     property output : Output
     property root : Rule
+    property rules : Array(Rule)
     property cursor : Int32
 
     @output : Output
 
-    def initialize(@root : Rule, @rules : Array(Rule), @input : String, @cursor = 0)
+    def initialize(
+      @root : Rule,
+      @rules : Array(Rule),
+      @input : String,
+      @cursor = 0,
+      @buffer = "",
       @output = Output.new
-      @buffer = ""
-    end
-
-    def copy(atom)
-      clone = self.clone
-      clone.root = Rule.new(atom: atom)
-      clone.cursor = @cursor
-      clone
+    )
     end
 
     def merge(parser)

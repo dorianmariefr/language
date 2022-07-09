@@ -2,8 +2,6 @@ require "colorize"
 
 class Language
   class Atom
-    def_clone
-
     class None < Atom
       def initialize(@parent : Atom? = nil)
       end
@@ -65,9 +63,16 @@ class Language
       end
 
       private def match(parser)
-        clone = parser.copy(atom: self)
-        clone.output = Output.new
+        clone = Parser.new(
+          root: root,
+          rules: parser.rules,
+          input: parser.input,
+          cursor: parser.cursor,
+          buffer: parser.buffer
+        )
+
         @parent.not_nil!.parse(clone)
+
         parser.cursor = clone.cursor
         parser.buffer = clone.buffer
         parser.output << clone.output
@@ -102,7 +107,13 @@ class Language
       end
 
       def parse(parser)
-        clone = parser.copy(atom: self)
+        clone = Parser.new(
+          root: root,
+          rules: parser.rules,
+          input: parser.input,
+          cursor: parser.cursor,
+          buffer: parser.buffer
+        )
         @parent.not_nil!.parse(clone) if @parent
       rescue Parser::Interuption
       else
@@ -123,7 +134,13 @@ class Language
       end
 
       def parse(parser)
-        clone = parser.copy(atom: self)
+        clone = Parser.new(
+          root: root,
+          rules: parser.rules,
+          input: parser.input,
+          cursor: parser.cursor,
+          buffer: parser.buffer
+        )
         @parent.not_nil!.parse(clone) if @parent
         parser.cursor = clone.cursor
       end
@@ -160,13 +177,16 @@ class Language
       end
 
       def parse(parser)
-        clone = parser.copy(atom: self)
+        return unless @parent
 
-        if @parent
-          clone.buffer = ""
-          clone.output = Output.new
-          @parent.not_nil!.parse(clone)
-        end
+        clone = Parser.new(
+          root: root,
+          rules: parser.rules,
+          input: parser.input,
+          cursor: parser.cursor,
+        )
+
+        @parent.not_nil!.parse(clone)
 
         if clone.buffer?
           parser.output[@name] = Output.new(clone.buffer)
@@ -188,8 +208,21 @@ class Language
       end
 
       def parse(parser)
-        left_clone = parser.copy(atom: self)
-        right_clone = parser.copy(atom: self)
+        left_clone = Parser.new(
+          root: root,
+          rules: parser.rules,
+          input: parser.input,
+          cursor: parser.cursor,
+          buffer: parser.buffer
+        )
+
+        right_clone = Parser.new(
+          root: root,
+          rules: parser.rules,
+          input: parser.input,
+          cursor: parser.cursor,
+          buffer: parser.buffer
+        )
 
         begin
           @left.not_nil!.parse(left_clone)
@@ -211,7 +244,13 @@ class Language
 
       def parse(parser)
         @left.not_nil!.parse(parser)
-        right_clone = parser.copy(atom: self)
+        right_clone = Parser.new(
+          root: root,
+          rules: parser.rules,
+          input: parser.input,
+          cursor: parser.cursor,
+          buffer: parser.buffer
+        )
         @right.not_nil!.parse(right_clone)
         parser.merge(right_clone)
       end
@@ -270,6 +309,10 @@ class Language
 
     def inspect(io)
       to_s(io)
+    end
+
+    private def root
+      Rule.new(atom: self)
     end
   end
 end

@@ -6,8 +6,6 @@ require "./language/rule"
 require "./language/output"
 
 class Language
-  def_clone
-
   VERSION = "0.1.1"
 
   @root : Rule

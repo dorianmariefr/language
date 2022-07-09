@@ -1,12 +1,14 @@
 class Language
   class Output
-    def_clone
-
     alias Type = String | Array(Output) | Hash(Symbol, Output)
 
     getter raw : Type
 
     def initialize(@raw : Type = "")
+    end
+
+    def clone
+      Output.new(@raw.clone)
     end
 
     def []=(key : Symbol, value : Output)

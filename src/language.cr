@@ -6,7 +6,7 @@ require "./language/rule"
 require "./language/output"
 
 class Language
-  VERSION = "0.2.0"
+  VERSION = version
 
   @root : Rule
   @rules : Array(Rule)

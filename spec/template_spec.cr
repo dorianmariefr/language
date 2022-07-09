@@ -173,6 +173,25 @@ describe "template" do
   end
 
   it %(parses "{user.first_name}") do
-    template.parse("{user.first_name}").should eq_code({:call => {:left => { :name => "user" }, :right => { :name => "first_name" }}})
+    template.parse("{user.first_name}").should eq_code({
+      :call => {
+        :left  => {:name => "user"},
+        :right => {:name => "first_name"},
+      },
+    })
+  end
+
+  it %(parses "{user.first_name.upcase}") do
+    template.parse("{user.first_name.upcase}").should eq_code({
+      :call => {
+        :left  => {:name => "user"},
+        :right => {
+          :call => {
+            :left  => {:name => "first_name"},
+            :right => {:name => "upcase"},
+          },
+        },
+      },
+    })
   end
 end

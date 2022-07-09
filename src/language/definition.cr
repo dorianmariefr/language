@@ -1,6 +1,6 @@
 class Language
   class Definition
-    class NoRuleFound < Exception
+    class RuleNotFound < Exception
     end
 
     @atom : Atom
@@ -22,10 +22,18 @@ class Language
       @atom.parse(input)
     end
 
+    def rule(name)
+      Atom::Rule.new(name: name)
+    end
+
+    def find_atom!(name)
+      @language.find_atom(name) ||
+        raise(RuleNotFound.new("No atom found name #{name.inspect}"))
+    end
+
     macro method_missing(method)
       def {{method}}
-        @language.find_atom({{method.symbolize}}) ||
-          raise(NoRuleFound.new({{method.stringify}}))
+        find_atom!({{method.symbolize}})
       end
     end
   end

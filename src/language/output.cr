@@ -1,3 +1,5 @@
+require "colorize"
+
 class Language
   class Output
     alias Type = String | Array(Output) | Hash(Symbol, Output)
@@ -12,6 +14,8 @@ class Language
     end
 
     def []=(key : Symbol, value : Output)
+      puts caller.first(3)
+      puts "#{inspect}.[]=(#{key.inspect}, #{value.inspect})".colorize(:blue)
       case @raw
       when String
         @raw = {key => value}
@@ -23,6 +27,7 @@ class Language
     end
 
     def merge(other : Output)
+      puts "#{inspect}.merge(#{other.inspect})".colorize(:cyan)
       case @raw
       when String
         case other.raw
@@ -55,6 +60,7 @@ class Language
     end
 
     def <<(other)
+      puts "#{inspect} << #{other.inspect}".colorize(:green)
       case @raw
       when String
         case other.raw

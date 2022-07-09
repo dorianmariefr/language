@@ -7,6 +7,19 @@ class Language
       end
     end
 
+    class Rule < Atom
+      def initialize(@name : Symbol)
+      end
+
+      def parse(parser)
+        parser.find_rule!(@name).not_nil!.parse(parser)
+      end
+
+      def to_s(io)
+        "rule(#{@name.inspect})".to_s(io)
+      end
+    end
+
     class Any < Atom
       def initialize(@parent : Atom? = nil)
       end
@@ -226,10 +239,14 @@ class Language
 
         begin
           @left.not_nil!.parse(left_clone)
-          parser.merge(left_clone)
+          parser.cursor = left_clone.cursor
+          parser.buffer = left_clone.buffer
+          parser.output.merge(left_clone.output)
         rescue Parser::Interuption
           @right.not_nil!.parse(right_clone)
-          parser.merge(right_clone)
+          parser.cursor = right_clone.cursor
+          parser.buffer = right_clone.buffer
+          parser.output.merge(right_clone.output)
         end
       end
 
@@ -252,7 +269,9 @@ class Language
           buffer: parser.buffer
         )
         @right.not_nil!.parse(right_clone)
-        parser.merge(right_clone)
+        parser.cursor = right_clone.cursor
+        parser.buffer = right_clone.buffer
+        parser.output.merge(right_clone.output)
       end
 
       def to_s(io)
@@ -303,6 +322,10 @@ class Language
       And.new(left: self, right: other)
     end
 
+    def rule(name)
+      Rule.new(name: name)
+    end
+
     def parse(parser)
       raise NotImplementedError.new("#{self.class}#parse")
     end
@@ -312,7 +335,7 @@ class Language
     end
 
     private def root
-      Rule.new(atom: self)
+      Language::Rule.new(atom: self)
     end
   end
 end

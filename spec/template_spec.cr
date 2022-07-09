@@ -105,7 +105,7 @@ template = Language.create do
   # call
 
   rule(:call) do
-    (string.aka(:left) >> dot >> string.aka(:right)).aka(:call) | string
+    (string.aka(:left) >> dot >> rule(:call).aka(:right)).aka(:call) | string
   end
 
   # code

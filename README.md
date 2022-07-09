@@ -46,6 +46,13 @@ boolean.parse("true") # {:boolean => "true"}
   `goodbye`
 - `>>` (same as `<<`) is used as "and", e.g. `str("hel") >> str("lo")`
   will match `hello`
+- `rule(:name)` is used for recursively looking up an existing rule, e.g.
+  ```crystal
+  rule(:call) do
+    (string.aka(:left) >> dot >> rule(:call).aka(:right)) |
+      string
+  end
+  ```
 
 See [the spec/ folder](https://github.com/dorianmariefr/language/tree/main/spec)
 for more examples.

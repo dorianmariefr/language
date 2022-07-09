@@ -1,5 +1,8 @@
 class Language
   class Parser
+    class RuleNotFound < Exception
+    end
+
     property input : String
     property buffer : String
     property output : Output
@@ -19,10 +22,12 @@ class Language
     )
     end
 
-    def merge(parser)
-      @cursor = parser.cursor
-      @buffer = parser.buffer
-      @output.merge(parser.output)
+    def find_rule(name)
+      (@rules + [@root]).find { |rule| rule.name == name }
+    end
+
+    def find_rule!(name)
+      find_rule(name) || raise(RuleNotFound.new("No rule named #{name.inspect} found"))
     end
 
     def parse

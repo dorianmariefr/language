@@ -69,5 +69,9 @@ class Language
     def buffer?
       @buffer != ""
     end
+
+    def output?
+      @output.present?
+    end
   end
 end

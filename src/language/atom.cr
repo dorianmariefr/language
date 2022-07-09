@@ -201,11 +201,11 @@ class Language
 
         @parent.not_nil!.parse(clone)
 
-        if clone.buffer?
+        if clone.output?
+          parser.output = Output.new({@name => clone.output})
+        else
           parser.output[@name] = Output.new(clone.buffer)
           parser.buffer = ""
-        else
-          parser.output = Output.new({@name => clone.output})
         end
 
         parser.cursor = clone.cursor

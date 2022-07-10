@@ -24,25 +24,27 @@ class Language
     instance
   end
 
-  def parse(input)
+  def parse(input) : Output
     Parser.new(root: @root, rules: @rules, input: input).parse
   end
 
-  def root(&block)
+  def root(&block) : Nil
     atom = with Definition.new(name: :root, language: self) yield
     @root = Rule.new(atom: atom)
+    nil
   end
 
-  def rule(name, &block)
+  def rule(name, &block) : Nil
     atom = with Definition.new(name: name, language: self) yield
     @rules << Rule.new(name: name, atom: atom)
+    nil
   end
 
-  def find_rule(name)
+  def find_rule(name) : Rule?
     (@rules + [@root]).find { |rule| rule.name == name }
   end
 
-  def find_atom(name)
+  def find_atom(name) : Atom?
     rule = find_rule(name)
     rule ? rule.not_nil!.atom : nil
   end

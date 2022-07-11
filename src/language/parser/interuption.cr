@@ -1,11 +1,11 @@
 class Language
   class Parser
     class Interuption < Exception
-      def initialize(@parser : Parser)
+      def initialize(@parser : Parser, @atom : Atom? = Atom.new)
       end
 
       def message
-        "#{input}\n#{" " * cursor}^\n"
+        "#{input}\n#{" " * cursor}^\n#{@atom.inspect}"
       end
 
       private def cursor

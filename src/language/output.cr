@@ -74,7 +74,7 @@ class Language
         when String
           return
         when Array(Output)
-          @raw = other.raw
+          @raw = @raw.as(Array(Output)) + other.raw.as(Array(Output))
         when Hash(Symbol, Output)
           @raw.as(Array(Output)) << other
         end
@@ -97,7 +97,7 @@ class Language
         when String
           @raw = @raw.as(String) + other.raw.as(String)
         when Array(Output)
-          @raw = other.raw
+          @raw = [other]
         when Hash(Symbol, Output)
           @raw = [other]
         end

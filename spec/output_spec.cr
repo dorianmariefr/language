@@ -81,7 +81,7 @@ describe Language::Output do
           output = array.clone
           other = array_hello
           output.merge(other)
-          output.should eq(["Hello"])
+          output.should eq(["Bye", "Hello"])
         end
       end
 
@@ -141,7 +141,7 @@ describe Language::Output do
           output = string.clone
           other = array
           output << other
-          output.should eq(["Bye"])
+          output.should eq([["Bye"]])
         end
       end
 

@@ -45,11 +45,11 @@ class Language
       def parse(parser)
         return unless @parent
 
-        @min.times do
-          match(parser)
-        end
-
         if @max.nil?
+          @min.times do
+            match(parser)
+          end
+
           begin
             loop do
               match(parser)
@@ -57,8 +57,11 @@ class Language
           rescue Parser::Interuption
           end
         else
-          (@max.not_nil! - @min).times do
-            match(parser)
+          begin
+            (@max.not_nil! - @min).times do
+              match(parser)
+            end
+          rescue Parser::Interuption
           end
         end
       end
@@ -130,7 +133,7 @@ class Language
         @parent.not_nil!.parse(clone) if @parent
       rescue Parser::Interuption
       else
-        raise Parser::Interuption.new(parser)
+        raise Parser::Interuption.new(parser, self)
       end
 
       def to_s(io)

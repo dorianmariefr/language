@@ -176,6 +176,8 @@ code = Language.create do
     call
   end
 
+  # code
+
   rule(:code) do
     whitespaces >> statement.repeat(1) >> whitespaces
   end

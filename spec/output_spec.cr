@@ -170,7 +170,7 @@ describe Language::Output do
           output = array.clone
           other = array_hello
           output << other
-          output.should eq(["Bye", "Hello"])
+          output.should eq(["Bye", ["Hello"]])
         end
       end
 

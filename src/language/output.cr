@@ -1,3 +1,5 @@
+require "colorize"
+
 class Language
   class Output
     alias Type = String | Array(Output) | Hash(Symbol, Output)
@@ -48,6 +50,13 @@ class Language
     end
 
     def []=(key : Symbol, value : Output)
+      if ENV.fetch("DEBUG", nil)
+        puts "[]=".colorize(:cyan)
+        pp self
+        pp key
+        pp value
+      end
+
       case @raw
       when String
         @raw = {key => value}
@@ -59,6 +68,12 @@ class Language
     end
 
     def merge(other : Output)
+      if ENV.fetch("DEBUG", nil)
+        puts "merge".colorize(:cyan)
+        pp self
+        pp other
+      end
+
       case @raw
       when String
         case other.raw
@@ -91,6 +106,12 @@ class Language
     end
 
     def <<(other)
+      if ENV.fetch("DEBUG", nil)
+        puts "<<".colorize(:cyan)
+        pp self
+        pp other
+      end
+
       case @raw
       when String
         case other.raw
@@ -102,14 +123,7 @@ class Language
           @raw = [other]
         end
       when Array(Output)
-        case other.raw
-        when String
-          @raw.as(Array(Output)) << other
-        when Array(Output)
-          @raw = @raw.as(Array(Output)) + other.raw.as(Array(Output))
-        when Hash(Symbol, Output)
-          @raw.as(Array(Output)) << other
-        end
+        @raw.as(Array(Output)) << other
       when Hash(Symbol, Output)
         case other.raw
         when String

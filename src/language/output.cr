@@ -2,11 +2,11 @@ require "colorize"
 
 class Language
   class Output
-    alias Type = String | Array(Output) | Hash(Symbol, Output)
+    alias Type = Nil | String | Array(Output) | Hash(Symbol, Output)
 
     getter raw : Type
 
-    def initialize(@raw : Type = "")
+    def initialize(@raw : Type = nil)
     end
 
     def clone
@@ -14,7 +14,7 @@ class Language
     end
 
     def present?
-      @raw != ""
+      @raw != nil
     end
 
     def as_s : String
@@ -58,6 +58,8 @@ class Language
       end
 
       case @raw
+      when Nil
+        @raw = {key => value}
       when String
         @raw = {key => value}
       when Array(Output)
@@ -75,6 +77,8 @@ class Language
       end
 
       case @raw
+      when Nil
+        @raw = other.raw
       when String
         case other.raw
         when String
@@ -113,6 +117,15 @@ class Language
       end
 
       case @raw
+      when Nil
+        case other.raw
+        when String
+          @raw = [other]
+        when Array(Output)
+          @raw = [other]
+        when Hash(Symbol, Output)
+          @raw = [other]
+        end
       when String
         case other.raw
         when String

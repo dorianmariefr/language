@@ -58,7 +58,7 @@ class Language
           end
         else
           begin
-            (@max.not_nil! - @min).times do
+            (@min..@max.not_nil!).each do
               match(parser)
             end
           rescue Parser::Interuption

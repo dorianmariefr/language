@@ -85,7 +85,7 @@ code = Language.create do
     zero | (positive_digit >> digit.repeat)
   end
 
-  rule(:fraction) do
+  rule(:decimal) do
     dot.ignore >> digit.repeat(1)
   end
 
@@ -97,7 +97,7 @@ code = Language.create do
     (
       minus.aka(:sign).maybe >>
         whole.aka(:whole) >>
-        fraction.aka(:fraction).maybe >>
+        decimal.aka(:decimal).maybe >>
         exponent.aka(:exponent).maybe
     ).aka(:number) | boolean
   end

@@ -34,10 +34,10 @@ class Language
       @root.parse(self)
 
       if @cursor == @input.size
-        if @output == ""
-          Output.new(@buffer)
-        else
+        if @output.present?
           @output
+        else
+          Output.new(@buffer)
         end
       else
         raise NotEndOfInput.new(self)

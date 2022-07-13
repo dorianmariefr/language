@@ -1,7 +1,7 @@
 require "./spec_helper"
 
 def eq_code(expected)
-  eq([{:code => expected}])
+  eq([{:code => [expected]}])
 end
 
 template = Language.create do
@@ -89,7 +89,7 @@ template = Language.create do
     zero | (positive_digit >> digit.repeat)
   end
 
-  rule(:fraction) do
+  rule(:decimal) do
     dot.ignore >> digit.repeat(1)
   end
 
@@ -101,7 +101,7 @@ template = Language.create do
     (
       minus.aka(:sign).maybe >>
         whole.aka(:whole) >>
-        fraction.aka(:fraction).maybe >>
+        decimal.aka(:decimal).maybe >>
         exponent.aka(:exponent).maybe
     ).aka(:number) | boolean
   end
@@ -206,11 +206,15 @@ template = Language.create do
   # template
 
   root do
-    part.repeat(1)
+    part.repeat(1) | str("").aka(:text).repeat(1, 1)
   end
 end
 
 describe "template" do
+  it %(parses "") do
+    template.parse("").should eq([{:text => ""}])
+  end
+
   it %(parses "Hello world") do
     template.parse("Hello world").should eq([{:text => "Hello world"}])
   end
@@ -219,7 +223,7 @@ describe "template" do
     template.parse("1 = {1}").should eq(
       [
         {:text => "1 = "},
-        {:code => {:number => {:whole => "1"}}},
+        {:code => [{:number => {:whole => "1"}}]},
       ]
     )
   end

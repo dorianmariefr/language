@@ -31,4 +31,3 @@ Template::Parser = Language.create do
     part.repeat(1) | str("").aka(:text).repeat(1, 1)
   end
 end
-

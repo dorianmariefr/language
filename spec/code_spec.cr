@@ -25,8 +25,8 @@ describe "code" do
           :value => [{ :string => "Dorian" }]
         },
         {
-          :key => [{ :name => "age" }],
-          :value => [{ :number => { :whole => "29" } }]
+          :key => "age",
+          :value => [{ :integer => { :whole => "29" } }]
         }
       ]
     }])
@@ -36,11 +36,11 @@ describe "code" do
     Code::Parser.parse(%({1: a, 2: b})).should eq([{
       :dictionnary => [
         {
-          :key => [{ :number => { :whole => "1" }}],
+          :key => [{ :integer => { :whole => "1" }}],
           :value => [{ :name => "a" }]
         },
         {
-          :key => [{ :number => { :whole => "2" }}],
+          :key => [{ :integer => { :whole => "2" }}],
           :value => [{ :name => "b" }]
         },
       ]
@@ -51,15 +51,15 @@ describe "code" do
     Code::Parser.parse(%({a: true\n, b: false , c: nothing})).should eq([{
       :dictionnary => [
         {
-          :key => [{ :name => "a" }],
+          :key => "a",
           :value => [{ :boolean => "true" }]
         },
         {
-          :key => [{ :name => "b" }],
+          :key => "b",
           :value => [{ :boolean => "false" }]
         },
         {
-          :key => [{ :name => "c" }],
+          :key => "c",
           :value => [{ :nothing => "nothing" }]
         },
       ]
@@ -70,17 +70,17 @@ describe "code" do
     Code::Parser.parse(%({a: {b: {c: 1}}})).should eq([{
       :dictionnary => [
         {
-          :key => [{ :name => "a" }],
+          :key => "a",
           :value => [{
             :dictionnary => [
               {
-                :key => [{ :name => "b" }],
+                :key => "b",
                 :value => [{
                   :dictionnary => [
                     {
-                      :key => [{ :name => "c" }],
+                      :key => "c",
                       :value => [
-                        { :number => { :whole => "1" } }
+                        { :integer => { :whole => "1" } }
                       ]
                     },
                   ]
@@ -113,5 +113,21 @@ describe "code" do
         [{ :call => { :left => { :name => "User" }, :right => { :name => "laurie" } } }],
       ]
     }])
+  end
+
+  it %(parses "0") do
+    Code::Parser.parse("0").should eq([{ :integer => { :whole => "0" } }])
+  end
+
+  it %(parses "1") do
+    Code::Parser.parse("1").should eq([{ :integer => { :whole => "1" } }])
+  end
+
+  it %(parses "1230") do
+    Code::Parser.parse("1230").should eq([{ :integer => { :whole => "1230" } }])
+  end
+
+  it %(parses "0.1") do
+    Code::Parser.parse("0.1").should eq([{ :decimal => { :whole => "0", :decimal => "1" } }])
   end
 end

@@ -34,42 +34,6 @@ Code::Parser = Language.create do
 
   rule(:whitespaces) { (space | newline).repeat }
 
-  # name
-
-  rule(:name_character) do
-    space.absent >>
-      newline.absent >>
-      comma.absent >>
-      colon.absent >>
-      dot.absent >>
-      opening_bracket.absent >>
-      closing_bracket.absent >>
-      opening_square_bracket.absent >>
-      closing_square_bracket.absent >>
-      equal.absent >>
-      left_caret.absent >>
-      right_caret.absent >>
-      any
-  end
-
-  rule(:name) do
-    name_character.repeat(1).aka(:name)
-  end
-
-  # nothing
-
-  rule(:nothing) do
-    str("nothing").aka(:nothing) | rule(:name)
-  end
-
-  # boolean
-
-  rule(:boolean) do
-    (str("true") | str("false")).aka(:boolean) | nothing
-  end
-
-  # number
-
   rule(:positive_digit) do
     one | two | three | four | five | six | seven | eight | nine
   end
@@ -86,21 +50,73 @@ Code::Parser = Language.create do
     zero | (positive_digit >> digit.repeat)
   end
 
-  rule(:decimal) do
+  # name
+
+  rule(:name_character) do
+    space.absent >>
+      newline.absent >>
+      comma.absent >>
+      colon.absent >>
+      dot.absent >>
+      single_quote.absent >>
+      double_quote.absent >>
+      opening_bracket.absent >>
+      closing_bracket.absent >>
+      opening_square_bracket.absent >>
+      closing_square_bracket.absent >>
+      equal.absent >>
+      left_caret.absent >>
+      right_caret.absent >>
+      any
+  end
+
+  rule(:name) do
+    digit.absent >> name_character >> name_character.repeat
+  end
+
+  # nothing
+
+  rule(:nothing) do
+    str("nothing").aka(:nothing) | rule(:name).aka(:name)
+  end
+
+  # boolean
+
+  rule(:boolean) do
+    (str("true") | str("false")).aka(:boolean) | nothing
+  end
+
+  # integer
+
+  rule(:integer_exponent) do
+    e >> rule(:integer)
+  end
+
+  rule(:integer) do
+    (
+      sign.aka(:sign).maybe >>
+        whole.aka(:whole) >>
+        integer_exponent.aka(:exponent).maybe
+    ).aka(:integer) | boolean
+  end
+
+  # decimal
+
+  rule(:decimal_decimal) do
     dot.ignore >> digit.repeat(1)
   end
 
-  rule(:exponent) do
-    e >> sign.aka(:sign).maybe >> digit.repeat(1).aka(:whole)
+  rule(:decimal_exponent) do
+    e >> rule(:decimal)
   end
 
-  rule(:number) do
+  rule(:decimal) do
     (
-      minus.aka(:sign).maybe >>
+      sign.aka(:sign).maybe >>
         whole.aka(:whole) >>
-        decimal.aka(:decimal).maybe >>
-        exponent.aka(:exponent).maybe
-    ).aka(:number) | boolean
+        decimal_decimal.aka(:decimal) >>
+        decimal_exponent.aka(:exponent).maybe
+    ).aka(:decimal) | integer
   end
 
   # string
@@ -124,7 +140,7 @@ Code::Parser = Language.create do
   end
 
   rule(:string) do
-    (double_quoted_string | single_quoted_string).aka(:string) | number
+    (double_quoted_string | single_quoted_string).aka(:string) | decimal
   end
 
   # array
@@ -136,20 +152,26 @@ Code::Parser = Language.create do
   rule(:array) do
     (
       opening_square_bracket.ignore >>
-      whitespaces.ignore >>
-      array_element.repeat(0, 1) >>
-      (whitespaces >> comma >> whitespaces >> array_element).repeat >>
-      whitespaces.ignore >>
-      closing_square_bracket.ignore
+        whitespaces.ignore >>
+        array_element.repeat(0, 1) >>
+        (whitespaces >> comma >> whitespaces >> array_element).repeat >>
+        whitespaces.ignore >>
+        closing_square_bracket.ignore
     ).aka(:array) | string
   end
 
   # dictionnary
 
+  rule(:dictionnary_key) do
+    (
+      rule(:name).aka(:key) >> colon
+    ) | (
+      rule(:code).aka(:key) >> (colon | (whitespaces >> equal >> right_caret))
+    )
+  end
+
   rule(:dictionnary_key_value) do
-    rule(:code).aka(:key) >>
-      whitespaces >>
-      (colon | (equal >> right_caret)) >>
+    dictionnary_key >>
       whitespaces >>
       rule(:code).aka(:value)
   end
@@ -157,11 +179,11 @@ Code::Parser = Language.create do
   rule(:dictionnary) do
     (
       opening_bracket.ignore >>
-      whitespaces.ignore >>
-      dictionnary_key_value.repeat(0, 1) >>
-      (whitespaces >> comma >> whitespaces >> dictionnary_key_value).repeat >>
-      whitespaces.ignore >>
-      closing_bracket.ignore
+        whitespaces.ignore >>
+        dictionnary_key_value.repeat(0, 1) >>
+        (whitespaces >> comma >> whitespaces >> dictionnary_key_value).repeat >>
+        whitespaces.ignore >>
+        closing_bracket.ignore
     ).aka(:dictionnary) | array
   end
 

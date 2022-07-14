@@ -19,13 +19,13 @@ describe "template" do
     Template::Parser.parse("1 = {1}").should eq(
       [
         {:text => "1 = "},
-        {:code => [{:number => {:whole => "1"}}]},
+        {:code => [{:integer => {:whole => "1"}}]},
       ]
     )
   end
 
   it %(parses "{1}") do
-    Template::Parser.parse("{1}").should eq_code({:number => {:whole => "1"}})
+    Template::Parser.parse("{1}").should eq_code({:integer => {:whole => "1"}})
   end
 
   it %(parses "{"hello"}") do

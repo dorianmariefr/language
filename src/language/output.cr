@@ -17,12 +17,32 @@ class Language
       @raw != nil
     end
 
+    def is_nil?
+      @raw.is_a?(Nil)
+    end
+
+    def as_nil
+      @raw.as(Nil)
+    end
+
+    def is_string?
+      @raw.is_a?(String)
+    end
+
     def as_s : String
       @raw.as(String)
     end
 
+    def is_array?
+      @raw.is_a?(Array(Output))
+    end
+
     def as_a : Array(Output)
       @raw.as(Array(Output))
+    end
+
+    def is_hash?
+      @raw.is_a?(Hash(Symbol, Output))
     end
 
     def as_h : Hash(Symbol, Output)

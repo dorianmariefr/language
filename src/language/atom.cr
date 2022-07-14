@@ -2,11 +2,6 @@ require "colorize"
 
 class Language
   class Atom
-    class None < Atom
-      def initialize(@parent : Atom? = nil)
-      end
-    end
-
     class Rule < Atom
       def initialize(@name : Symbol)
       end
@@ -21,25 +16,21 @@ class Language
     end
 
     class Any < Atom
-      def initialize(@parent : Atom? = nil)
-      end
-
       def parse(parser)
-        @parent.not_nil!.parse(parser) if @parent
         parser.consume(1)
       end
 
       def to_s(io)
-        if @parent
-          "#{@parent}.any".to_s(io)
-        else
-          "any".to_s(io)
-        end
+        "any".to_s(io)
       end
     end
 
     class Repeat < Atom
-      def initialize(@parent : Atom? = nil, @min : Int32 = 0, @max : Int32? = nil)
+      def initialize(
+        @parent : (Atom | Language)? = nil,
+        @min : Int32 = 0,
+        @max : Int32? = nil
+      )
       end
 
       def parse(parser)
@@ -96,12 +87,10 @@ class Language
     end
 
     class Str < Atom
-      def initialize(@string : String, @parent : Atom? = nil)
+      def initialize(@string : String)
       end
 
       def parse(parser)
-        @parent.not_nil!.parse(parser) if @parent
-
         if parser.next?(@string)
           parser.consume(@string.size)
         else
@@ -110,16 +99,12 @@ class Language
       end
 
       def to_s(io)
-        if @parent
-          "#{@parent}.str(#{@string.inspect})".to_s(io)
-        else
-          "str(#{@string.inspect})".to_s(io)
-        end
+        "str(#{@string.inspect})".to_s(io)
       end
     end
 
     class Absent < Atom
-      def initialize(@parent : Atom? = nil)
+      def initialize(@parent : (Atom | Language)? = nil)
       end
 
       def parse(parser)
@@ -146,7 +131,7 @@ class Language
     end
 
     class Ignore < Atom
-      def initialize(@parent : Atom? = nil)
+      def initialize(@parent : (Atom | Language)? = nil)
       end
 
       def parse(parser)
@@ -171,7 +156,7 @@ class Language
     end
 
     class Maybe < Atom
-      def initialize(@parent : Atom? = nil)
+      def initialize(@parent : (Atom | Language)? = nil)
       end
 
       def parse(parser)
@@ -189,7 +174,7 @@ class Language
     end
 
     class Aka < Atom
-      def initialize(@name : Symbol, @parent : Atom? = nil)
+      def initialize(@name : Symbol, @parent : (Atom | Language)? = nil)
       end
 
       def parse(parser)
@@ -220,7 +205,7 @@ class Language
     end
 
     class Or < Atom
-      def initialize(@left : Atom? = nil, @right : Atom? = nil)
+      def initialize(@left : (Atom | Language)? = nil, @right : (Atom | Language)? = nil)
       end
 
       def parse(parser)
@@ -259,7 +244,7 @@ class Language
     end
 
     class And < Atom
-      def initialize(@left : Atom? = nil, @right : Atom? = nil)
+      def initialize(@left : (Atom | Language)? = nil, @right : (Atom | Language)? = nil)
       end
 
       def parse(parser)
@@ -280,9 +265,6 @@ class Language
       def to_s(io)
         "#{@left} >> #{@right}".to_s(io)
       end
-    end
-
-    def initialize
     end
 
     def any
@@ -331,6 +313,10 @@ class Language
 
     def parse(parser)
       raise NotImplementedError.new("#{self.class}#parse")
+    end
+
+    def to_s(io)
+      "".to_s(io)
     end
 
     def inspect(io)

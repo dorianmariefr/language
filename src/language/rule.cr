@@ -3,7 +3,7 @@ class Language
     getter name
     getter atom
 
-    def initialize(@name : Symbol = :root, @atom : Atom? = nil)
+    def initialize(@name : Symbol = :root, @atom : (Atom | Language)? = nil)
     end
 
     def parse(parser)

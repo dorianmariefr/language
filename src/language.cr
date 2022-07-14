@@ -24,7 +24,24 @@ class Language
     instance
   end
 
-  def parse(input) : Output
+  def parse(parser : Parser)
+    clone = Parser.new(
+      root: @root,
+      rules: @rules,
+      input: parser.input,
+      cursor: parser.cursor,
+      buffer: parser.buffer,
+      output: parser.output
+    )
+
+    clone.parse(check_end_of_input: false)
+
+    parser.cursor = clone.cursor
+    parser.buffer = clone.buffer
+    parser.output = clone.output
+  end
+
+  def parse(input : String) : Output
     Parser.new(root: @root, rules: @rules, input: input).parse
   end
 
@@ -44,8 +61,40 @@ class Language
     (@rules + [@root]).find { |rule| rule.name == name }
   end
 
-  def find_atom(name) : Atom?
+  def find_atom(name) : (Atom | Language)?
     rule = find_rule(name)
     rule ? rule.not_nil!.atom : nil
+  end
+
+  def absent
+    Atom::Absent.new(parent: self)
+  end
+
+  def ignore
+    Atom::Ignore.new(parent: self)
+  end
+
+  def maybe
+    Atom::Maybe.new(parent: self)
+  end
+
+  def repeat(min = 0, max = nil)
+    Atom::Repeat.new(parent: self, min: min, max: max)
+  end
+
+  def aka(name)
+    Atom::Aka.new(parent: self, name: name)
+  end
+
+  def |(other)
+    Atom::Or.new(left: self, right: other)
+  end
+
+  def >>(other)
+    Atom::And.new(left: self, right: other)
+  end
+
+  def <<(other)
+    Atom::And.new(left: self, right: other)
   end
 end

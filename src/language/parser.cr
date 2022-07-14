@@ -30,10 +30,10 @@ class Language
       find_rule(name) || raise(RuleNotFound.new("No rule named #{name.inspect} found"))
     end
 
-    def parse : Output
+    def parse(check_end_of_input = true) : Output
       @root.parse(self)
 
-      if @cursor == @input.size
+      if @cursor == @input.size || !check_end_of_input
         if @output.present?
           @output
         else

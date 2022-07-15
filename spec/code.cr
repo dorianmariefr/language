@@ -32,6 +32,12 @@ Code::Parser = Language.create do
   rule(:eight) { str("8") }
   rule(:nine) { str("9") }
 
+  rule(:nothing_keyword) { str("nothing") }
+  rule(:nil_keyword) { str("nil") }
+  rule(:null_keyword) { str("null") }
+  rule(:true_keyword) { str("true") }
+  rule(:false_keyword) { str("false") }
+
   rule(:whitespaces) { (space | newline).repeat }
 
   rule(:positive_digit) do
@@ -77,13 +83,13 @@ Code::Parser = Language.create do
   # nothing
 
   rule(:nothing) do
-    str("nothing").aka(:nothing) | rule(:name).aka(:name)
+    (nothing_keyword | nil_keyword | null_keyword).aka(:nothing) | rule(:name).aka(:name)
   end
 
   # boolean
 
   rule(:boolean) do
-    (str("true") | str("false")).aka(:boolean) | nothing
+    (true_keyword | false_keyword).aka(:boolean) | nothing
   end
 
   # integer

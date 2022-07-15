@@ -130,4 +130,24 @@ describe "code" do
   it %(parses "0.1") do
     Code::Parser.parse("0.1").should eq([{ :decimal => { :whole => "0", :decimal => "1" } }])
   end
+
+  it %(parses "nothing") do
+    Code::Parser.parse("nothing").should eq([{ :nothing => "nothing" }])
+  end
+
+  it %(parses "nil") do
+    Code::Parser.parse("nil").should eq([{ :nothing => "nil" }])
+  end
+
+  it %(parses "null") do
+    Code::Parser.parse("null").should eq([{ :nothing => "null" }])
+  end
+
+  it %(parses "true") do
+    Code::Parser.parse("true").should eq([{ :boolean => "true" }])
+  end
+
+  it %(parses "false") do
+    Code::Parser.parse("false").should eq([{ :boolean => "false" }])
+  end
 end
